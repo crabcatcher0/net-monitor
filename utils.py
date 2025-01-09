@@ -1,11 +1,14 @@
 import os
 import re
+import subprocess
+from pydantic.networks import IPvAnyNetwork
 
 
-def scan_network(gateway_ip: str):
+def scan_network(gateway_ip: IPvAnyNetwork, root_password: str):
     try:
         print("Scanning the network....")
-        nmap_scan = os.popen(f"sudo nmap {gateway_ip} -n -sP").read()
+        command = f"echo {root_password} | sudo -S nmap {gateway_ip} -n -sP"
+        nmap_scan = subprocess.check_output(command, shell=True, text=True)
 
         with open("scan_result.txt", "w") as file:
             file.write(nmap_scan)
