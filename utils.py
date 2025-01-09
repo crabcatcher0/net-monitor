@@ -1,6 +1,7 @@
 import os
 import re
 
+
 def scan_network(gateway_ip: str):
     try:
         print("Scanning the network....")
@@ -11,7 +12,6 @@ def scan_network(gateway_ip: str):
 
     except Exception as e:
         return f"Error: {str(e)}"
-    
 
 
 def extract_ip_and_mac():
@@ -44,6 +44,15 @@ def extract_ip_and_mac():
             results.append(f"IP: {ip} Mac: Unknown (Vendor: Unknown)")
 
         return {"ip_and_mac": results}
-    
+
     except FileNotFoundError:
         return "[!] Please perform a scan first."
+
+
+def remove_scan_result():
+    file_path = "scan_result.txt"
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print("Successfully cleared logs")
+    else:
+        print("[!] File not found")

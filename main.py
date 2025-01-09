@@ -10,7 +10,8 @@ app = FastAPI()
 
 @app.get("/scan-result/")
 def list_scan_result():
-    return extract_ip_and_mac()
+    data = extract_ip_and_mac()
+    return data
 
 
 if __name__ == "__main__":
