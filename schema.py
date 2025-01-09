@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic.networks import IPvAnyNetwork
 
+
 class ScanResultModel(BaseModel):
     result: Dict[str, Any]
 

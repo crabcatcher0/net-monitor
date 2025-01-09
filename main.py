@@ -16,9 +16,12 @@ tags_metadata = [
 ]
 app = FastAPI(openapi_tags=tags_metadata)
 
+
 @app.post("/scan/", tags=["Network"])
 def scan_the_network(payload: ScanModel):
-    scan_network(gateway_ip=payload.network_gateway, root_password=payload.root_password)
+    scan_network(
+        gateway_ip=payload.network_gateway, root_password=payload.root_password
+    )
     return {"message": "Scanned completed."}
 
 
@@ -40,9 +43,8 @@ def delete_logs():
                 status_code=404, detail="[!] Logs might already be cleared."
             )
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"{str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"{str(e)}")
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True)
