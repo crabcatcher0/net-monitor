@@ -4,7 +4,6 @@ import re
 def scan_network(gateway_ip: str):
     try:
         print("Scanning the network....")
-
         nmap_scan = os.popen(f"sudo nmap {gateway_ip} -n -sP").read()
 
         with open("scan_result.txt", "w") as file:
