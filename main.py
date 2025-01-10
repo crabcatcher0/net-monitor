@@ -3,6 +3,7 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi import HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from schema import ScanModel
 from utils import scan_network
@@ -14,7 +15,16 @@ tags_metadata = [
         "description": "Network Related Operations",
     },
 ]
+
 app = FastAPI(openapi_tags=tags_metadata)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/scan/", tags=["Network"])
@@ -32,7 +42,7 @@ def list_scan_result():
 
 
 @app.get("/remove-logs/", tags=["Network"])
-def delete_logs():
+def clear_scan_logs():
     file_path = "scan_result.txt"
     try:
         if os.path.exists(file_path):

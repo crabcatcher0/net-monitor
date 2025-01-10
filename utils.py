@@ -1,4 +1,3 @@
-import os
 import re
 import subprocess
 from pydantic.networks import IPvAnyNetwork
@@ -50,12 +49,3 @@ def extract_ip_and_mac():
 
     except FileNotFoundError:
         return "[!] Please perform a scan first."
-
-
-def remove_scan_result():
-    file_path = "scan_result.txt"
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print("Successfully cleared logs")
-    else:
-        print("[!] File not found")
