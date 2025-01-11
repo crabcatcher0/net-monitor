@@ -1,10 +1,10 @@
 import os
-import re
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from schema import ScanModel
 from utils import scan_network
@@ -33,12 +33,7 @@ app.add_middleware(
 
 @app.post("/scan/", tags=["Network"])
 def scan_the_network(payload: ScanModel):
-    file_path = "scan_result.txt"
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
     scan_network(gateway_ip=payload.network_gateway)
-
     return {"message": "Network scan completed."}
 
 
@@ -63,20 +58,14 @@ def clear_scan_logs():
         raise HTTPException(status_code=500, detail=f"{str(e)}")
 
 
-@app.get("/scan-time/", tags=["General"])
-def retrive_scan_date_time():
-    date_time_pattern = r"^Starting Nmap .*? at ([\d-]+ [\d:]+)"
+@app.get("/save-scan-result/", tags=["General"])
+def download_scan_result():
+    file_path = "scan_result.txt"
     try:
-        with open("scan_result.txt", "r") as file:
-            first_line = file.readline()
-
-        match = re.match(date_time_pattern, first_line)
-        if match:
-            date_time = match.group(1)
-            return {"date_time": date_time}
+        return FileResponse(file_path)
 
     except FileNotFoundError:
-        return {"message": "[!] Please perform a scan"}
+        return "[!] Please perform a scan."
 
 
 if __name__ == "__main__":

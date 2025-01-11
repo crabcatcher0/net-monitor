@@ -14,8 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import ScanTable from "../scan-table/page";
-// import PerformScan from "../perform-scan/page";
+import PerformScanGiveTable from "../perform-and-scan/page";
 
 export default function Page() {
   const [activeView, setActiveView] = useState("scan-summary");
@@ -46,7 +45,7 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
-            {activeView === "scan-summary" && <ScanTable />}
+            {activeView === "scan-summary" && <PerformScanGiveTable />}
             {/* {activeView === "perform-scan" && <PerformScan />} */}
           </div>
         </div>

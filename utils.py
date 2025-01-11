@@ -1,10 +1,13 @@
+from datetime import datetime
 import subprocess
 import re
+import csv
 
 
 def scan_network(gateway_ip: str):
     try:
-        command: list[str] = ["pkexec", "nmap", gateway_ip, "-n", "-sP"]
+        # -sn no port scan
+        command: list[str] = ["pkexec", "nmap", gateway_ip, "-n", "-sn"]
 
         result = subprocess.run(
             command,
@@ -56,3 +59,23 @@ def extract_ip_and_mac():
 
     except FileNotFoundError:
         return "[!] Please perform a scan first."
+
+
+def convert_to_csv():
+    scan_result = extract_ip_and_mac()
+
+    ip_list = scan_result["ip_list"]
+    mac_list = scan_result["mac_list"]
+
+    if len(ip_list) != len(mac_list):
+        return "Error creating csv."
+
+    data = list(zip(ip_list, mac_list))
+    now = datetime.now()
+    dt_string = now.strftime("%Y/%M/%d %H:%M")
+
+    with open("scan-result.csv", "w", newline="") as out_file:
+        writer = csv.writer(out_file)
+        writer.writerow(["IP Address", "MAC Address"])
+        writer.writerows(data)
+        writer.writerow([f"Scan date and time: {dt_string}"])

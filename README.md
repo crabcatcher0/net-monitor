@@ -3,7 +3,7 @@
 Monitor the local network with interactive web interface.
 
 ## Installation (for now)
-** Need to shift to docker or  automate whole process with one command
+** Need to automate whole process with one command
 
 * Note** Must have `Nmap`
 * create virtual environment `python -m venv venv`

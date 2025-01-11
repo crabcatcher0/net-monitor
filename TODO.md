@@ -1,4 +1,11 @@
 * Backend --> Frontend (ongoing)
 * Improve UI
-* slight delay on getting root_password
-* Implement "/scan-time/" on Dashboard
+* Download csv od scan result
+
+#####
+* (Jan 12)
+- `pkexec` added
+- removed deleting result in /scan/
+- removed /scan-date-time/
+- combined perform-scan and fetch scan result in one page
+####
