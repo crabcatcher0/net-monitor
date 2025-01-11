@@ -1,19 +1,26 @@
-import re
 import subprocess
-from pydantic.networks import IPvAnyNetwork
+import re
 
 
-def scan_network(gateway_ip: IPvAnyNetwork, root_password: str):
+def scan_network(gateway_ip: str):
     try:
-        print("Scanning the network....")
-        command = f"echo {root_password} | sudo -S nmap {gateway_ip} -n -sP"
-        nmap_scan = subprocess.check_output(command, shell=True, text=True)
+        command: list[str] = ["pkexec", "nmap", gateway_ip, "-n", "-sP"]
+
+        result = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        if result.returncode != 0:
+            raise RuntimeError(f"Error running nmap: {result.stderr}")
 
         with open("scan_result.txt", "w") as file:
-            file.write(nmap_scan)
+            file.write(result.stdout)
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        print(f"Error: {str(e)}")
 
 
 def extract_ip_and_mac():
@@ -23,9 +30,10 @@ def extract_ip_and_mac():
         with open("scan_result.txt", "r") as scan_result:
             data = scan_result.readlines()
 
-        results: list[str] = []
-        unmatched_ips: set[str] = set()
+        ip_list: list[str] = []
+        mac_list: list[str] = []
 
+        unmatched_ips: set[str] = set()
         current_ip = None
 
         for line in data:
@@ -33,19 +41,18 @@ def extract_ip_and_mac():
             if ip_match:
                 current_ip = ip_match.group(1)
                 unmatched_ips.add(current_ip)
+                ip_list.append(current_ip)
+                mac_list.append("Unknown")
 
             mac_match = re.search(mac_pattern, line)
             if mac_match and current_ip:
                 mac_address = mac_match.group(1)
                 vendor = mac_match.group(2) or "Unknown"
-                results.append(f"IP: {current_ip} Mac: {mac_address} ({vendor})")
+                mac_list[ip_list.index(current_ip)] = f"{mac_address} ({vendor})"
                 unmatched_ips.discard(current_ip)
                 current_ip = None
 
-        for ip in unmatched_ips:
-            results.append(f"IP: {ip} Mac: Unknown (Vendor: Unknown)")
-
-        return {"ip_and_mac": results}
+        return {"ip_list": ip_list, "mac_list": mac_list}
 
     except FileNotFoundError:
         return "[!] Please perform a scan first."

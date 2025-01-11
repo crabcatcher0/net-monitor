@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 
 export default function PerformScan() {
   const [gatewayIp, setGatewayIp] = useState("");
-  const [rootPassword, setRootPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -22,7 +21,6 @@ export default function PerformScan() {
         },
         body: JSON.stringify({
           network_gateway: gatewayIp,
-          root_password: rootPassword,
         }),
       });
 
@@ -33,8 +31,8 @@ export default function PerformScan() {
       const data = await response.json();
       setMessage(data.message);
 
-      if (data.message === "Scanned completed.") {
-        window.location.reload();
+      if (data.message === "Network scan completed.") {
+        setTimeout(() => window.location.reload(), 1000);
       }
     } catch (error: any) {
       setMessage(error.message || "An error occurred");
@@ -49,22 +47,13 @@ export default function PerformScan() {
       <form onSubmit={handleScan}>
         <div className="grid w-full items-center gap-4">
           <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="gateway_ip">Router Gateway</Label>
+            <Label htmlFor="gateway_ip">Router Gateway (e.g.   192.168.1.0/24)</Label>
             <Input
               id="gateway_ip"
-              placeholder="IP address of your router"
+              placeholder="IP address of your router e.g, 192.168.1.0/24"
               value={gatewayIp}
               onChange={(e) => setGatewayIp(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="root_password">Root Password</Label>
-            <Input
-              id="root_password"
-              type="password"
-              placeholder="Root password of your system"
-              value={rootPassword}
-              onChange={(e) => setRootPassword(e.target.value)}
+              required
             />
           </div>
         </div>

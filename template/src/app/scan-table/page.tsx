@@ -18,40 +18,40 @@ export default function ScanTable() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const response = await fetch("http://127.0.0.1:8001/scan-result/");
         if (!response.ok) {
           throw new Error("Failed to fetch scan results");
         }
         const data = await response.json();
-  
-        if (data.result && Array.isArray(data.result.ip_and_mac)) {
-          const parsedResults = data.result.ip_and_mac.map((entry: string) => {
-            const match = entry.match(/IP:\s([\d.]+)\sMac:\s([\w:]+)\s\((.+)?\)/);
-            return match
-              ? {
-                  ip: match[1],
-                  mac: match[2],
-                  vendor: match[3] || "Unknown",
-                }
-              : { ip: "Unknown", mac: "Unknown", vendor: "Unknown" };
-          });
+
+        if (data.result && Array.isArray(data.result.ip_list) && Array.isArray(data.result.mac_list)) {
+          const ipList = data.result.ip_list;
+          const macList = data.result.mac_list;
+
+          const parsedResults = ipList.map((ip, index) => ({
+            ip,
+            mac: macList[index]?.split(" ")[0] || "Unknown",
+            vendor: macList[index]?.match(/\((.+?)\)/)?.[1] || "Unknown",
+          }));
+
           setScanResults(parsedResults);
         } else {
           setScanResults([]);
         }
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "An unexpected error occurred");
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
 
   return (
     <div>
