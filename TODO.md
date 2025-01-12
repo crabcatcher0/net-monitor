@@ -1,5 +1,10 @@
 * Backend --> Frontend (ongoing)
 * Improve UI
+* Implement wireshark
+* Alert on new devices & Mark home devices
+* Implement sqlite3 (use `sql_orm`: https://github.com/crabcatcher0/sql_Crab)
+
+Note:: `sql_orm` make only for sqlite 
 
 #####
 # (Jan 12) Completed task
