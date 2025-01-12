@@ -62,20 +62,28 @@ def extract_ip_and_mac():
 
 
 def convert_to_csv():
-    scan_result = extract_ip_and_mac()
+    try:
+        scan_result = extract_ip_and_mac()
 
-    ip_list = scan_result["ip_list"]
-    mac_list = scan_result["mac_list"]
+        ip_list = scan_result["ip_list"]
+        mac_list = scan_result["mac_list"]
 
-    if len(ip_list) != len(mac_list):
-        return "Error creating csv."
+        if len(ip_list) != len(mac_list):
+            raise ValueError("Error creating csv file.")
 
-    data = list(zip(ip_list, mac_list))
-    now = datetime.now()
-    dt_string = now.strftime("%Y/%M/%d %H:%M")
+        data = list(zip(ip_list, mac_list))
 
-    with open("scan-result.csv", "w", newline="") as out_file:
-        writer = csv.writer(out_file)
-        writer.writerow(["IP Address", "MAC Address"])
-        writer.writerows(data)
-        writer.writerow([f"Scan date and time: {dt_string}"])
+        now = datetime.now()
+        dt_string = now.strftime("%Y/%m/%d %H:%M")
+
+        file_path = "scan-result.csv"
+        with open(file_path, "w", newline="") as out_file:
+            writer = csv.writer(out_file)
+            writer.writerow(["IP Address", "MAC Address"])
+            writer.writerows(data)
+            writer.writerow([f"Scan date and time: {dt_string}"])
+        return file_path
+
+    except Exception as e:
+
+        return f"Error: {str(e)}"

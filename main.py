@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import uvicorn
 from fastapi import FastAPI
@@ -9,6 +10,7 @@ from fastapi.responses import FileResponse
 from schema import ScanModel
 from utils import scan_network
 from utils import extract_ip_and_mac
+from utils import convert_to_csv
 
 tags_metadata = [
     {
@@ -34,7 +36,8 @@ app.add_middleware(
 @app.post("/scan/", tags=["Network"])
 def scan_the_network(payload: ScanModel):
     scan_network(gateway_ip=payload.network_gateway)
-    return {"message": "Network scan completed."}
+    dt = datetime.now()
+    return {"message": f"Network scan completed at {dt.strftime("%Y/%m/%d %H:%M")}."}
 
 
 @app.get("/scan-result/", tags=["Network"])
@@ -45,27 +48,32 @@ def list_scan_result():
 
 @app.get("/remove-logs/", tags=["Network"])
 def clear_scan_logs():
-    file_path = "scan_result.txt"
+    files_to_remove = ["scan_result.txt", "scan-result.csv"]
     try:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            return {"message": "Successfully cleared logs."}
-        else:
-            raise HTTPException(
-                status_code=404, detail="[!] Logs might already be cleared."
-            )
+        for file in files_to_remove:
+            if os.path.exists(file):
+                os.remove(file)
+                return {"message": "Successfully cleared logs."}
+            else:
+                raise HTTPException(
+                    status_code=404, detail="[!] Logs might already be cleared."
+                )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{str(e)}")
 
 
 @app.get("/save-scan-result/", tags=["General"])
 def download_scan_result():
-    file_path = "scan_result.txt"
     try:
-        return FileResponse(file_path)
+        file = convert_to_csv()
 
-    except FileNotFoundError:
-        return "[!] Please perform a scan."
+        if not os.path.exists(file):
+            raise HTTPException(status_code=500, detail="[!] File service error.")
+
+        return FileResponse(file, status_code=200)
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="[!] Please perform a scan")
 
 
 if __name__ == "__main__":
