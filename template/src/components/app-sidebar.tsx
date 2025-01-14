@@ -28,6 +28,10 @@ const data = {
           title: "Scan Summary",
           url: "scan-summary",
         },
+        {
+          title: "Monitor Network",
+          url: "persistance-data"
+        }
       ],
     },
   ],

@@ -15,6 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import PerformScanGiveTable from "../perform-and-scan/page";
+import Persistance from "../persistance-data/page";
 
 export default function Page() {
   const [activeView, setActiveView] = useState("scan-summary");
@@ -36,7 +37,7 @@ export default function Page() {
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
                     {activeView === "scan-summary" && "Scan Summary"}
-                    {/* {activeView === "perform-scan" && "Perform Scan"} */}
+                    {activeView === "persistance-data" && "Monitor Network"}
                   </BreadcrumbLink>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -46,7 +47,7 @@ export default function Page() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
             {activeView === "scan-summary" && <PerformScanGiveTable />}
-            {/* {activeView === "perform-scan" && <PerformScan />} */}
+            {activeView === "persistance-data" && <Persistance />}
           </div>
         </div>
       </SidebarInset>

@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,17 +49,23 @@ def list_scan_result():
 @app.get("/remove-logs/", tags=["Network"])
 def clear_scan_logs():
     files_to_remove = ["scan_result.txt", "scan-result.csv"]
+    files_removed: list[str] = []
+
     try:
         for file in files_to_remove:
             if os.path.exists(file):
                 os.remove(file)
-                return {"message": "Successfully cleared logs."}
-            else:
-                raise HTTPException(
-                    status_code=404, detail="[!] Logs might already be cleared."
-                )
+                files_removed.append(file)
+
+        if not files_removed:
+            raise HTTPException(
+                status_code=404, detail="[!] Logs might already be cleared."
+            )
+
+        return {"message": f"Successfully cleared logs: {', '.join(files_removed)}."}
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
 @app.get("/save-scan-result/", tags=["General"])
@@ -73,3 +80,7 @@ def download_scan_result():
 
     except Exception:
         raise HTTPException(status_code=500, detail="[!] Please perform a scan")
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True)

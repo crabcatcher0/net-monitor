@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/table";
 import { FileDown } from "lucide-react";
 
-
 interface ScanResult {
   ip: string;
   mac: string;
@@ -42,6 +41,7 @@ export default function PerformScanGiveTable() {
 
     setLoading(true);
     setMessage("");
+    setError(null);
 
     try {
       const response = await fetch("http://127.0.0.1:8001/scan/", {
@@ -63,7 +63,7 @@ export default function PerformScanGiveTable() {
 
       fetchScanResults();
     } catch (error) {
-      setMessage((error as Error).message || "An error occurred");
+      setError((error as Error).message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -127,7 +127,13 @@ export default function PerformScanGiveTable() {
 
   return (
     <div className="p-4">
-      <h2 className="text-lg font-bold mb-4">Scan the Network</h2>
+      <h2 className="text-lg font-bold mb-2">Scan the Network</h2>
+      <p className="mt-2 mb-7 text-sm text-gray-700">
+        <span className="text-sm text-red-800">**Important:**</span> Once the page is reloaded, any unsaved data will be lost. 
+        To ensure data is persistance, please navigate to the 
+         <strong> Monitor</strong> page. There, you can save your scan results and continue 
+        using the app without losing any progress.
+      </p>
       <form onSubmit={handleScan}>
         <div className="grid w-full items-center gap-4">
           <div className="flex flex-col space-y-1.5">
@@ -149,6 +155,7 @@ export default function PerformScanGiveTable() {
       </form>
 
       {message && <p className="mt-4 text-sm text-green-800">{message}</p>}
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
       {fetchingResults ? (
         <p className="mt-5 text-sm">Fetching scan results...</p>
@@ -156,6 +163,10 @@ export default function PerformScanGiveTable() {
         <p className="mt-5 text-sm">Please scan the network to view devices.</p>
       ) : (
         <>
+        {/* <div className="mt-2">
+          <Button className=" bg-gray-800">Save to Database</Button>
+          <span className="p-4 text-sm text-red-600">**This is for flagging</span>
+        </div> */}
           <Table className="mt-5">
             <TableCaption>List of devices connected to your network.</TableCaption>
             <TableHeader>
@@ -178,13 +189,13 @@ export default function PerformScanGiveTable() {
             </TableBody>
           </Table>
           <div className="mt-2">
-          <Button onClick={downloadResults} 
-            className="flex items-center space-x-1
-             text-black bg-transparent 
-             hover:bg-gray-200 focus:bg-transparent">
-            <FileDown className="w-5 h-5" />
-            <span>Download results</span>
-          </Button>
+            <Button onClick={downloadResults} 
+              className="flex items-center space-x-1
+               text-black bg-transparent 
+               hover:bg-gray-200 focus:bg-transparent">
+              <FileDown className="w-5 h-5" />
+              <span>Download results</span>
+            </Button>
           </div>
         </>
       )}
