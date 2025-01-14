@@ -4,7 +4,7 @@
 * Alert on new devices & Mark home devices
 * Implement sqlite3 (use `sql_orm`: https://github.com/crabcatcher0/sql_Crab)
 
-Note:: `sql_orm` make only for sqlite 
+Note:: `sql_orm` make only for sqlite (ongoing)
 
 #####
 # (Jan 12) Completed task
@@ -14,4 +14,6 @@ Note:: `sql_orm` make only for sqlite
 - combined perform-scan and fetch scan result in one page (Frontend)
 - added ip validation
 - download scan result
+# (Jan 15) Completed task
+- automated setup and run
 ####
