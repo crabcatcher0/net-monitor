@@ -8,3 +8,8 @@ class ScanResultModel(BaseModel):
 
 class ScanModel(BaseModel):
     network_gateway: str
+
+
+class FileModel(BaseModel):
+    scan_ip: str
+    file_name: str

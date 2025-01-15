@@ -163,10 +163,6 @@ export default function PerformScanGiveTable() {
         <p className="mt-5 text-sm">Please scan the network to view devices.</p>
       ) : (
         <>
-        {/* <div className="mt-2">
-          <Button className=" bg-gray-800">Save to Database</Button>
-          <span className="p-4 text-sm text-red-600">**This is for flagging</span>
-        </div> */}
           <Table className="mt-5">
             <TableCaption>List of devices connected to your network.</TableCaption>
             <TableHeader>

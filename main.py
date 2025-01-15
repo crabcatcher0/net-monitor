@@ -7,7 +7,11 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
+from crab_sql.get_data import GetData
+
+from models import ScanResult
 from schema import ScanModel
+from schema import FileModel
 from utils import scan_network
 from utils import extract_ip_and_mac
 from utils import convert_to_csv
@@ -21,6 +25,7 @@ tags_metadata = [
         "name": "General",
         "description": "General utils",
     },
+    {"name": "Persistance Data", "description": "Related to Database"},
 ]
 
 app = FastAPI(openapi_tags=tags_metadata)
@@ -80,6 +85,29 @@ def download_scan_result():
 
     except Exception:
         raise HTTPException(status_code=500, detail="[!] Please perform a scan")
+
+
+############## Database Related ##############
+##############################################
+
+
+@app.post("/scan-and-save-db/", tags=["Persistance Data"])
+def create_and_save_result(payload: FileModel):
+
+    scan_network(gateway_ip=payload.scan_ip)
+
+    file_path = "scan_result.txt"
+    if os.path.exists(file_path):
+        ScanResult.insert(  # type: ignore
+            {"file_name": payload.file_name, "file": file_path}
+        )
+    return {"message": "Success on scan and saved to db."}
+
+
+@app.get("/get-result-db/", tags=["Persistance Data"])
+def view_data_from_db():
+    data = GetData.get_data(table_name="scanresult", fields=["file_name", "file"])  # type: ignore
+    return {"data": data}
 
 
 if __name__ == "__main__":
