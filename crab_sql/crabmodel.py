@@ -118,14 +118,27 @@ class CrabModel:
             conn.commit()
 
     @classmethod
-    def filter(cls, field: str, value):
+    def filter(cls, field: str, value, multiple_fields: dict = None):
         with sqlite3.connect(DATABASE_NAME) as conn:
             cursor = conn.cursor()
             model = cls.__name__.lower()
             result = []
             try:
                 query = f"SELECT * FROM {model} WHERE {field} = ?"
-                cursor.execute(query, (value,))
+
+                if multiple_fields:
+                    additional_conditions = " AND ".join(
+                        [f"{key} = ?" for key in multiple_fields.keys()]
+                    )
+                    query += f" AND {additional_conditions}"
+
+                values = (
+                    [value] + list(multiple_fields.values())
+                    if multiple_fields
+                    else [value]
+                )
+
+                cursor.execute(query, tuple(values))
 
                 rows = cursor.fetchall()
                 columns = [desc[0] for desc in cursor.description]
@@ -160,21 +173,6 @@ class CrabModel:
                 print(f"Database error on order_by: {str(e)}")
 
             return result
-
-    # @classmethod
-    # def get_data(cls, **kwargs):
-    #     with sqlite3.connect(DATABASE_NAME) as conn:
-    #         cursor = conn.cursor()
-
-    #         column, value = list(kwargs.items())[0]
-
-    #         query = f"SELECT * FROM {cls.table_name} WHERE {column} = ?"
-    #         cursor.execute(query, (value,))
-    #         row = cursor.fetchone()
-
-    #         if row:
-    #             return cls(*row)
-    #         return None
 
     @classmethod
     def __init_subclass__(cls, **kwargs):

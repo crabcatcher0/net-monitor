@@ -2,6 +2,7 @@
 * Improve UI
 * Implement wireshark
 * Alert on new devices & Mark home devices
+* Fetch the unique records and display on  `Monitor Network`
 
 Note:: `sql_orm` make only for sqlite (ongoing)
 
@@ -12,7 +13,7 @@ Note:: `sql_orm` make only for sqlite (ongoing)
 - removed /scan-date-time/
 - combined perform-scan and fetch scan result in one page (Frontend)
 - added ip validation
-- download scan result 
+- download scan result
 - auto remove result files
 
 # (Jan 15) Completed task

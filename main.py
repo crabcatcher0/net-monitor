@@ -7,11 +7,8 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from crab_sql.get_data import GetData
-
 from models import ScanResult
 from schema import ScanModel
-from schema import FileModel
 from utils import scan_network
 from utils import extract_ip_and_mac
 from utils import convert_to_csv
@@ -91,23 +88,19 @@ def download_scan_result():
 ##############################################
 
 
-@app.post("/scan-and-save-db/", tags=["Persistance Data"])
-def create_and_save_result(payload: FileModel):
+@app.post("/scan-save-db/", tags=["Persistance Data"])
+def db_scan_save(payload: ScanModel):
+    scan_network(gateway_ip=payload.network_gateway)
+    data = extract_ip_and_mac()
 
-    scan_network(gateway_ip=payload.scan_ip)
+    for ip, mac in zip(data["ip_list"], data["mac_list"]):
+        existing_record = ScanResult.filter(field="ips", value=ip)
+        if existing_record:
+            continue
 
-    file_path = "scan_result.txt"
-    if os.path.exists(file_path):
-        ScanResult.insert(  # type: ignore
-            {"file_name": payload.file_name, "file": file_path}
-        )
-    return {"message": "Success on scan and saved to db."}
+        ScanResult.insert({"ips": ip, "macs": mac})
 
-
-@app.get("/get-result-db/", tags=["Persistance Data"])
-def view_data_from_db():
-    data = GetData.get_data(table_name="scanresult", fields=["file_name", "file"])  # type: ignore
-    return {"data": data}
+    return {"message": "Network scan completed and unique records are stored."}
 
 
 if __name__ == "__main__":

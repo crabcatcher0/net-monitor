@@ -6,7 +6,7 @@ from crab_sql.datatypes import DataTypes
 
 class ScanResult(CrabModel):
     _columns: dict[str, Any] = {
-        "file_name": DataTypes.varchar(max_length=15),
-        "file": DataTypes.file(),
-        "created": DataTypes.datetimefield(auto_add_now=True),
+        "ips": DataTypes.varchar(unique=True),
+        "macs": DataTypes.varchar(unique=True),
+        "created_at": DataTypes.datetimefield(auto_add_now=True),
     }
