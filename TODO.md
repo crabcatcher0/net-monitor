@@ -19,4 +19,7 @@ Note:: `sql_orm` make only for sqlite (ongoing)
 # (Jan 15) Completed task
 - automated setup and run
 - added `crab_sql`: https://github.com/crabcatcher0/sql_Crab orm for persistance data
+
+# (Jan 15) Completed task
+- Scanned and Data from db is fetched in frontend
 ####

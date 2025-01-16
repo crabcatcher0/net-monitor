@@ -7,6 +7,8 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
+from crab_sql.get_data import GetData
+
 from models import ScanResult
 from schema import ScanModel
 from utils import scan_network
@@ -101,6 +103,12 @@ def db_scan_save(payload: ScanModel):
         ScanResult.insert({"ips": ip, "macs": mac})
 
     return {"message": "Network scan completed and unique records are stored."}
+
+
+@app.get("/show-result-db/", tags=["Persistance Data"])
+def list_result_from_db():
+    data = GetData.get_data("scanresult", ["ips", "macs", "created_at"])
+    return {"data": data}
 
 
 if __name__ == "__main__":

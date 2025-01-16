@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,21 +12,19 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { Label } from "@/components/ui/label";
-
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,54 +32,67 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-
-const data: NetworkData[] = [
-  {
-    id: "1",
-    ip: "192.168.1.1",
-    mac: "00:1A:2B:3C:4D:5E",
-    vendor: "Cisco",
-  },
-  {
-    id: "2",
-    ip: "192.168.1.2",
-    mac: "00:1A:2B:3C:4D:5F",
-    vendor: "Netgear",
-  },
-  {
-    id: "3",
-    ip: "192.168.1.3",
-    mac: "00:1A:2B:3C:4D:60",
-    vendor: "Dell",
-  },
-  {
-    id: "4",
-    ip: "192.168.1.4",
-    mac: "00:1A:2B:3C:4D:61",
-    vendor: "HP",
-  },
-  {
-    id: "5",
-    ip: "192.168.1.5",
-    mac: "00:1A:2B:3C:4D:62",
-    vendor: "Cisco",
-  },
-]
+} from "@/components/ui/table";
 
 export type NetworkData = {
-  id: string
-  ip: string
-  mac: string
-  vendor: string
-}
+  id: string;
+  ip: string;
+  mac: string;
+  scan_date: string;
+};
 
 export default function NetworkTable() {
+  const [data, setData] = React.useState<NetworkData[]>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [isScanning, setIsScanning] = React.useState(false);
+  const [scanMessage, setScanMessage] = React.useState("");
+
+  React.useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch("http://localhost:8001/show-result-db/");
+        const result = await response.json();
+
+        if (response.ok) {
+          const transformedData = result.data.map((item: any, index: number) => ({
+            id: (index + 1).toString(),
+            ip: item[0],
+            mac: item[1],
+            scan_date: new Date(item[2]).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            }) + 
+            ", " +
+            new Date(item[2]).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
+          }));
+          setData(transformedData);
+        } else {
+          console.error("Failed to fetch data:", result.message);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   const columns: ColumnDef<NetworkData>[] = [
     {
       id: "number",
       header: "#",
-      cell: ({ row }) => <div>{Number(row.id) + 1}</div>,
+      cell: ({ row }) => <div>{row.index + 1}</div>,
       enableSorting: false,
       enableHiding: false,
     },
@@ -92,19 +103,20 @@ export default function NetworkTable() {
     },
     {
       accessorKey: "mac",
-      header: "MAC Address",
+      header: "MAC Address and Vendor",
       cell: ({ row }) => <div>{row.getValue("mac")}</div>,
     },
     {
-      accessorKey: "vendor",
-      header: "Vendor",
-      cell: ({ row }) => <div>{row.getValue("vendor")}</div>,
+      accessorKey: "scan_date",
+      header: "Scan Date and Time",
+      cell: ({ row }) => <div>{row.getValue("scan_date")}</div>,
     },
     {
       id: "actions",
+      header: "Actions",
       enableHiding: false,
       cell: ({ row }) => {
-        const device = row.original
+        const device = row.original;
 
         return (
           <DropdownMenu>
@@ -116,6 +128,9 @@ export default function NetworkTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                Flag as home device
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(device.ip)}
               >
@@ -126,22 +141,12 @@ export default function NetworkTable() {
               >
                 Copy MAC Address
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
-
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  ];
 
   const table = useReactTable({
     data,
@@ -160,32 +165,71 @@ export default function NetworkTable() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
+
+  const handleScanNetwork = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const gatewayIp = (document.getElementById("gateway_ip") as HTMLInputElement)
+      .value;
+
+    if (!gatewayIp) {
+      alert("Please enter a valid router gateway IP.");
+      return;
+    }
+
+    setIsScanning(true);
+    setScanMessage("");
+
+    try {
+      const response = await fetch("http://localhost:8001/scan-save-db/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ network_gateway: gatewayIp }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setScanMessage(result.message || "Network scan completed successfully.");
+      } else {
+        setScanMessage(result.message || "Failed to complete network scan.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setScanMessage("An error occurred while performing the network scan.");
+    } finally {
+      setIsScanning(false);
+    }
+  };
 
   return (
     <div className="p-4 w-full">
-        <p className=" text-sm mb-4">
-        **The scan results from scanned performed from this page are stored and can be accessed later for reference, analysis, 
-        or further actions.
-        </p>
-        <form>
+      <p className="text-sm mb-4">
+        **The scan results from scans performed from this page are stored and
+        can be accessed later for reference, analysis, or further actions.
+      </p>
+      <form onSubmit={handleScanNetwork}>
         <div className="grid w-full items-center gap-4">
           <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="gateway_ip">Router Gateway (e.g. 192.168.1.0/24)</Label>
+            <Label htmlFor="gateway_ip">
+              Router Gateway (e.g. 192.168.1.0/24)
+            </Label>
             <Input
               id="gateway_ip"
-              placeholder="IP address of your router e.g, 192.168.1.0/24"
+              placeholder="IP address of your router e.g., 192.168.1.0/24"
               required
             />
           </div>
         </div>
-        <div className="mt-2">
-          <Button type="submit">
-            Scan Network
+        <div className="mt-3">
+          <Button type="submit" disabled={isScanning}>
+            {isScanning ? "Scanning..." : "Scan Network"}
           </Button>
         </div>
       </form>
-        
+      {scanMessage && <p className="mt-4 text-green-600">{scanMessage}</p>}
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter IP addresses..."
@@ -217,11 +261,16 @@ export default function NetworkTable() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {data.length === 0 && (
+        <pre className="bg-gray-200 p-4 rounded">
+          No data. Raw Data: {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -237,7 +286,7 @@ export default function NetworkTable() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -273,23 +322,23 @@ export default function NetworkTable() {
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
       </div>
-  )
+    </div>
+  );
 }

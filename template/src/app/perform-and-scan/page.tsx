@@ -131,7 +131,7 @@ export default function PerformScanGiveTable() {
       <p className="mt-2 mb-7 text-sm text-gray-700">
         <span className="text-sm text-red-800">**Important:**</span> Once the page is reloaded, any unsaved data will be lost. 
         To ensure data is persistance, please navigate to the 
-         <strong> Monitor</strong> page. There, you can save your scan results and continue 
+         <strong> Monitor Network</strong> page. There, you can save your scan results and continue 
         using the app without losing any progress.
       </p>
       <form onSubmit={handleScan}>
