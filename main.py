@@ -39,7 +39,7 @@ app.add_middleware(
 
 @app.post("/scan/", tags=["Network"])
 def scan_the_network(payload: ScanModel):
-    scan_network(gateway_ip=payload.network_gateway)
+    scan_network(gateway_ip=payload.network_gateway.strip())
     dt = datetime.now()
     return {"message": f"Network scan completed at {dt.strftime("%Y/%m/%d %H:%M")}."}
 
@@ -92,7 +92,7 @@ def download_scan_result():
 
 @app.post("/scan-save-db/", tags=["Persistance Data"])
 def db_scan_save(payload: ScanModel):
-    scan_network(gateway_ip=payload.network_gateway)
+    scan_network(gateway_ip=payload.network_gateway.strip())
     data = extract_ip_and_mac()
 
     for ip, mac in zip(data["ip_list"], data["mac_list"]):
@@ -102,7 +102,7 @@ def db_scan_save(payload: ScanModel):
 
         ScanResult.insert({"ips": ip, "macs": mac})
 
-    return {"message": "Network scan completed and unique records are stored."}
+    return {"message": f"Network scan completed and unique records are stored."}
 
 
 @app.get("/show-result-db/", tags=["Persistance Data"])
@@ -111,5 +111,5 @@ def list_result_from_db():
     return {"data": data}
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True)
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", host="127.0.0.1", port=8001, reload=True)

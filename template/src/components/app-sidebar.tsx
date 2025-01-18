@@ -1,5 +1,4 @@
-import { Command, SquareTerminal } from "lucide-react";
-
+import { Command, SquareTerminal, LifeBuoy, Send } from "lucide-react";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
@@ -8,6 +7,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import NavMain from "./nav-main";
+import { NavSecondary } from "@/components/nav-secondary"
+
 
 const data = {
   teams: [
@@ -35,6 +36,18 @@ const data = {
       ],
     },
   ],
+  navSecondary: [
+    {
+      title: "Support",
+      url: "https://github.com/crabcatcher0",
+      icon: LifeBuoy,
+    },
+    {
+      title: "Feedback",
+      url: "https://github.com/crabcatcher0/net-monitor/issues",
+      icon: Send,
+    },
+  ],
 };
 
 export function AppSidebar({
@@ -49,6 +62,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} onItemSelect={onItemSelect} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
