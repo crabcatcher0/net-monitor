@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -19,6 +19,21 @@ import Persistance from "../persistance-data/page";
 
 export default function Page() {
   const [activeView, setActiveView] = useState("scan-summary");
+  const [localIp, setLocalIp] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLocalIp = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8001/my-ip/");
+        const data = await response.json();
+        setLocalIp(data.local_ip);
+      } catch (error) {
+        console.error("Failed to fetch IP:", error);
+      }
+    };
+
+    fetchLocalIp();
+  }, []);
 
   const handleItemSelect = (url: string) => {
     setActiveView(url);
@@ -40,6 +55,10 @@ export default function Page() {
                     {activeView === "persistance-data" && "Monitor Network"}
                   </BreadcrumbLink>
                 </BreadcrumbItem>
+                <Separator orientation="vertical" className="h-4" />
+                <BreadcrumbLink>
+                  Device: {localIp ? localIp : "Loading IP..."}
+                </BreadcrumbLink>
               </BreadcrumbList>
             </Breadcrumb>
           </div>

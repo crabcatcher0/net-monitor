@@ -14,6 +14,7 @@ from schema import ScanModel
 from utils import scan_network
 from utils import extract_ip_and_mac
 from utils import convert_to_csv
+from utils import my_ip
 
 tags_metadata = [
     {
@@ -70,6 +71,12 @@ def clear_scan_logs():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+@app.get("/my-ip/", tags=["Network"])
+def my_local_ip():
+    local_ip = my_ip()
+    return {"local_ip": local_ip}
 
 
 @app.get("/save-scan-result/", tags=["General"])

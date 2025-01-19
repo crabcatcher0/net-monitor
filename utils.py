@@ -2,6 +2,7 @@ from datetime import datetime
 import subprocess
 import re
 import csv
+import socket
 
 
 def scan_network(gateway_ip: str):
@@ -87,3 +88,11 @@ def convert_to_csv():
     except Exception as e:
 
         return f"Error: {str(e)}"
+
+
+def my_ip():
+    ss = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    ss.connect(("8.8.8.8", 80))
+    local_ip = ss.getsockname()[0]
+    ss.close
+    return local_ip

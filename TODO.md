@@ -2,7 +2,6 @@
 * Improve UI
 * Implement wireshark
 * Alert on new devices & Mark home devices
-* Fetch the unique records and display on  `Monitor Network`
 
 Note:: `sql_orm` make only for sqlite (ongoing)
 
@@ -20,6 +19,6 @@ Note:: `sql_orm` make only for sqlite (ongoing)
 - automated setup and run
 - added `crab_sql`: https://github.com/crabcatcher0/sql_Crab orm for persistance data
 
-# (Jan 15) Completed task
+# (Jan 16) Completed task
 - Scanned and Data from db is fetched in frontend
 ####
