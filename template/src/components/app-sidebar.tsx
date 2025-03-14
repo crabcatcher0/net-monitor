@@ -32,6 +32,10 @@ const data = {
         {
           title: "Monitor Network",
           url: "persistance-data"
+        },
+        {
+          title: "Target Device",
+          url: "target-device"
         }
       ],
     },
@@ -39,12 +43,12 @@ const data = {
   navSecondary: [
     {
       title: "Support",
-      url: "https://github.com/crabcatcher0",
+      url: "https://github.com/crabcatcher0/net-monitor",
       icon: LifeBuoy,
     },
     {
       title: "Feedback",
-      url: "https://github.com/crabcatcher0/net-monitor/issues",
+      url: "https://github.com/crabcatcher0/net-monitor",
       icon: Send,
     },
   ],

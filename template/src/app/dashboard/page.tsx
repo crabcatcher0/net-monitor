@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import PerformScanGiveTable from "../perform-and-scan/page";
 import Persistance from "../persistance-data/page";
+import TargetDevice from "../target-device/page";
 
 export default function Page() {
   const [activeView, setActiveView] = useState("scan-summary");
@@ -53,6 +54,8 @@ export default function Page() {
                   <BreadcrumbLink href="#">
                     {activeView === "scan-summary" && "Scan Summary"}
                     {activeView === "persistance-data" && "Monitor Network"}
+                    {activeView === "target-device" && "Target Device"}
+
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <Separator orientation="vertical" className="h-4" />
@@ -67,6 +70,8 @@ export default function Page() {
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
             {activeView === "scan-summary" && <PerformScanGiveTable />}
             {activeView === "persistance-data" && <Persistance />}
+            {activeView === "target-device" && <TargetDevice />}
+
           </div>
         </div>
       </SidebarInset>
